@@ -64,9 +64,9 @@ print()
 
 # Give the first IP address
 ipAddress = IP_ADDRESS_POOL[0]
-MAC = msg[29:34]
+MAC = msg[28:34]
 transactionID = msg[4:7]
-type = b'\x35\x01\x05' # type = OFFER
+type = b'\x35\x01\x02' # type = OFFER
 pkt = DHCP_PKT(ipAddress, MAC, transactionID, type)
 
 # Print client's DHCP Discover
@@ -75,5 +75,18 @@ for i,n in enumerate(pkt):
 	print(":" + format(pkt[i], 'x'), end = '')
 print()
 
-# Send a UDP message (Broadcast)
-s.sendto(b'Hello World!', DHCP_CLIENT)
+# Broadcast Offer
+s.sendto(pkt, DHCP_CLIENT)
+
+# Recieve a UDP message (Request)
+msg, addr = s.recvfrom(1024)
+
+# Give the first IP address
+ipAddress = msg[254:257]
+MAC = msg[28:34]
+transactionID = msg[4:7]
+type = b'\x35\x01\x05' # type = ACK
+pkt = DHCP_PKT(ipAddress, MAC, transactionID, type)
+
+# Broadcast ACK
+s.sendto(pkt, DHCP_CLIENT)
