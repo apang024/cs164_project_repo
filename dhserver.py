@@ -31,6 +31,7 @@ def stillavailable(requestedIP):
 	for i,n in enumerate(IP_ADDRESS_POOL):
 		if (IP_ADDRESS_POOL[i] == requestedIP) and (availability[i] == '1'):
 			availability[i] = '0'
+			print('UPDATED AVAILBILITY')
 			return True
 	
 	# IF NONE AVAILABLE
