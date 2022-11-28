@@ -29,12 +29,12 @@ def available():
 
 def stillavailable(requestedIP):
 	global availability
+	print('in stillAvailable')
 	for i,n in enumerate(IP_ADDRESS_POOL):
 		if ((IP_ADDRESS_POOL[i] == requestedIP) and (availability[i] == '1')):
 			availability[i] = '0'
 			print('UPDATED AVAILBILITY')
 			return True
-	
 	# IF NONE AVAILABLE
 	return False
 
@@ -112,6 +112,7 @@ while True:
 
 		# Give the first IP address && check still available?
 		if (stillavailable(msg[254:257])):
+			print ('stillavailable is TRUE')
 			MAC = msg[28:34]
 			transactionID = msg[4:7]
 			type = b'\x35\x01\x05' # type = ACK
