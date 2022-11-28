@@ -1,8 +1,7 @@
 from socket import *
 
-# First 24 bits are part of the same subnet
-DHCP_SERVER = ('192.168.0.1', 24)
-DHCP_CLIENT = ('255.255.255.255', 67)
+DHCP_SERVER = ('', 67)
+DHCP_CLIENT = ('255.255.255.255', 68)
 
 # Create a pool of addresses
 IP_ADDRESS_POOL = [ '192.168.0.10',
