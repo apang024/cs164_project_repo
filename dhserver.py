@@ -12,7 +12,20 @@ IP_ADDRESS_POOL = [ '192.168.0.10',
 					'192.168.0.14',
 					'192.168.0.15']
 
-# ip_address -> bytes
+availability = [ '1',
+				 '1',
+				 '1',
+				 '1',
+				 '1',
+				 '1']
+
+def available():
+	for i,n in enumerate(IP_ADDRESS_POOL):
+		if (availability[i] == '1'):
+			return IP_ADDRESS_POOL[i]
+	
+	# IF NONE AVAILABLE
+	return '1'
 
 # Create packet
 def DHCP_PKT(ipAddress, MAC, transactionID, type):
@@ -49,47 +62,52 @@ s.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
 # Bind socket to the well-known port reserved for DHCP servers
 s.bind(DHCP_SERVER)
 
-# Recieve a UDP message
-msg, addr = s.recvfrom(1024)
+while True:
+	# Recieve a UDP message
+	msg, addr = s.recvfrom(1024)
 
-# Print the client's MAC Address from the DHCP header
-print("Client's MAC Address is " + format(msg[28], 'x'), end = '')
-for i in range(29, 34):
-	print(":" + format(msg[i], 'x'), end = '')
-print()
+	# # Print the client's MAC Address from the DHCP header
+	# print("Client's MAC Address is " + format(msg[28], 'x'), end = '')
+	# for i in range(29, 34):
+	# 	print(":" + format(msg[i], 'x'), end = '')
+	# print()
 
-# Print client's DHCP Discover
-print("Client's DHCP Discover is " , end = '')
-for i,n in enumerate(msg):
-	print(":" + format(msg[i], 'x'), end = '')
-print()
+	# # Print client's DHCP Discover
+	# print("Client's DHCP Discover is " , end = '')
+	# for i,n in enumerate(msg):
+	# 	print(":" + format(msg[i], 'x'), end = '')
+	# print()
 
-# Give the first IP address
-ipAddress = IP_ADDRESS_POOL[0]
-MAC = msg[28:34]
-transactionID = msg[4:8]
-type = b'\x35\x01\x02' # type = OFFER
-pkt = DHCP_PKT(ipAddress, MAC, transactionID, type)
+	# Find an available IP address
+	ipAddress = available()
 
-# Print client's DHCP Discover
-print("Server's DHCP OFFER is " , end = '')
-for i,n in enumerate(pkt):
-	print(":" + format(pkt[i], 'x'), end = '')
-print()
+	while (ipAddress != '1'):
+		MAC = msg[28:34]
+		transactionID = msg[4:8]
+		type = b'\x35\x01\x02' # type = OFFER
+		pkt = DHCP_PKT(ipAddress, MAC, transactionID, type)
 
-# Broadcast Offer
-s.sendto(pkt, DHCP_CLIENT)
+		# # Print client's DHCP Discover
+		# print("Server's DHCP OFFER is " , end = '')
+		# for i,n in enumerate(pkt):
+		# 	print(":" + format(pkt[i], 'x'), end = '')
+		# print()
 
-# Recieve a UDP message (Request)
-msg, addr = s.recvfrom(1024)
+		# Broadcast Offer
+		s.sendto(pkt, DHCP_CLIENT)
 
-# Give the first IP address
-# ipAddress = msg[254:257]
-ipAddress = IP_ADDRESS_POOL[0]
-MAC = msg[28:34]
-transactionID = msg[4:7]
-type = b'\x35\x01\x05' # type = ACK
-pkt = DHCP_PKT(ipAddress, MAC, transactionID, type)
+		# Recieve a UDP message (Request)
+		msg, addr = s.recvfrom(1024)
 
-# Broadcast ACK
-s.sendto(pkt, DHCP_CLIENT)
+		# Give the first IP address
+		if (ipAddress == msg[254:257]):
+			MAC = msg[28:34]
+			transactionID = msg[4:7]
+			type = b'\x35\x01\x05' # type = ACK
+			pkt = DHCP_PKT(ipAddress, MAC, transactionID, type)
+
+			# Broadcast ACK
+			s.sendto(pkt, DHCP_CLIENT)
+			ipAddress == '1' # exit loop else keep checking new ipAddresses
+		else:
+			ipAddress = available()
