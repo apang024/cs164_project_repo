@@ -25,7 +25,7 @@ def DHCP_PKT(ipAddress, MAC, transactionID, type):
 	pkt += b'\x00\x00'							# Seconds elapsed
 	pkt += b'\x80\x00'							# Bootp flags
 	pkt += b'\x00\x00\x00\x00'					# Client IP address
-	pkt += socket.inet_aton(ipAddress)			# Your client IP address (4)
+	pkt += inet_aton(ipAddress)			# Your client IP address (4)
 	pkt += b'\x00\x00\x00\x00'					# Next server IP address
 	pkt += b'\x00\x00\x00\x00'					# Relay agent IP address giadder
 	pkt += MAC									# MAC address (6)
