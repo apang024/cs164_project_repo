@@ -22,6 +22,7 @@ availability = [ '1',
 def available():
 	for i,n in enumerate(IP_ADDRESS_POOL):
 		if (availability[i] == '1'):
+			availability[i] = 0
 			return IP_ADDRESS_POOL[i]
 	
 	# IF NONE AVAILABLE
