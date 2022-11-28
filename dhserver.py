@@ -20,6 +20,8 @@ availability = [ '1',
 				 '1']
 
 def available():
+	global IP_ADDRESS_POOL
+	global availability
 	for i,n in enumerate(IP_ADDRESS_POOL):
 		if (availability[i] == '1'):
 			return IP_ADDRESS_POOL[i]
@@ -28,6 +30,7 @@ def available():
 	return '-1'
 
 def stillavailable(requestedIP):
+	global IP_ADDRESS_POOL
 	global availability
 	print('in stillAvailable')
 	for i,n in enumerate(IP_ADDRESS_POOL):
