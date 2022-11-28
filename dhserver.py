@@ -115,8 +115,14 @@ while True:
 		# Recieve a UDP message (Request)
 		msg, addr = s.recvfrom(1024)
 
+		# Print client's DHCP Request
+		print("Client's DHCP Request is " , end = '')
+		for i,n in enumerate(msg):
+			print(":" + format(msg[i], 'x'), end = '')
+		print()
+
 		# Give the first IP address && check still available?
-		if (stillavailable(inet_aton(msg[254:258]))):
+		if (stillavailable(msg[254:258])):
 			print ('stillavailable is TRUE')
 			MAC = msg[28:34]
 			transactionID = msg[4:7]
