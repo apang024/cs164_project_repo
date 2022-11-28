@@ -116,7 +116,7 @@ while True:
 		msg, addr = s.recvfrom(1024)
 
 		# Give the first IP address && check still available?
-		if (stillavailable(msg[254:258])):
+		if (stillavailable(inet_aton(msg[254:258]))):
 			print ('stillavailable is TRUE')
 			MAC = msg[28:34]
 			transactionID = msg[4:7]
