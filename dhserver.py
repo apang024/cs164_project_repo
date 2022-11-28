@@ -1,3 +1,4 @@
+import socket
 from socket import *
 
 DHCP_SERVER = ('', 67)
@@ -11,9 +12,31 @@ IP_ADDRESS_POOL = [ '192.168.0.10',
 					'192.168.0.14',
 					'192.168.0.15']
 
-# Create packet
-# def BuildPacket:
+# ip_address -> bytes
 
+# Create packet
+def DHCP_PKT(ipAddress, MAC, transactionID, type):
+	pkt = b''
+	pkt += b'\x02'								# Message type: Boot Reply
+	pkt += b'\x01'								# Hardware type: Ethernet
+	pkt += b'\x06'								# Length
+	pkt += b'\x01'								# Hops
+	pkt += transactionID						# Transaction ID (4)
+	pkt += b'\x00\x00'							# Seconds elapsed
+	pkt += b'\x80\x00'							# Bootp flags
+	pkt += b'\x00\x00\x00\x00'					# Client IP address
+	pkt += socket.inet_aton(ipAddress)			# Your client IP address (4)
+	pkt += b'\x00\x00\x00\x00'					# Next server IP address
+	pkt += b'\x00\x00\x00\x00'					# Relay agent IP address giadder
+	pkt += MAC									# MAC address (6)
+	pkt += b'\x00' * 202						# Padding, software host name, boot file name
+	pkt += b'\x63\x82\x53\x63'					# Magic Cookie
+	pkt += type									# DHCP Message Type (Offer or ACK) (3)
+	pkt += b'\x00\x00\x00\x00\x00\x00'			# Server identifier
+	pkt += b'\x33\x04\x00\x00\x0e\x10'			# IP Address Lease Time
+	pkt += b'\x01\x04\xff\xff\xff\x00'			# SubnetMask
+	pkt += b'\x00' * 39							# Router, DNS, Domain Name, End, Padding
+	return pkt
 
 # Create a UDP socket
 s = socket(AF_INET, SOCK_DGRAM)
@@ -37,6 +60,19 @@ print()
 print("Client's DHCP Discover is " , end = '')
 for i,n in enumerate(msg):
 	print(":" + format(msg[i], 'x'), end = '')
+print()
+
+# Give the first IP address
+ipAddress = IP_ADDRESS_POOL[0]
+MAC = msg[29, 34]
+transactionID = msg[4, 7]
+type = b'\x35\x01\x05' # type = OFFER
+pkt = DHCP_PKT(ipAddress, MAC, transactionID, type)
+
+# Print client's DHCP Discover
+print("Server's DHCP OFFER is " , end = '')
+for i,n in enumerate(pkt):
+	print(":" + format(pkt[i], 'x'), end = '')
 print()
 
 # Send a UDP message (Broadcast)
