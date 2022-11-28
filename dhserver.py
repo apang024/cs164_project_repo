@@ -64,8 +64,8 @@ print()
 
 # Give the first IP address
 ipAddress = IP_ADDRESS_POOL[0]
-MAC = msg[29, 34]
-transactionID = msg[4, 7]
+MAC = msg[29:34]
+transactionID = msg[4:7]
 type = b'\x35\x01\x05' # type = OFFER
 pkt = DHCP_PKT(ipAddress, MAC, transactionID, type)
 
