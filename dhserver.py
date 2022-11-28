@@ -82,7 +82,8 @@ s.sendto(pkt, DHCP_CLIENT)
 msg, addr = s.recvfrom(1024)
 
 # Give the first IP address
-ipAddress = msg[254:257]
+# ipAddress = msg[254:257]
+ipAddress = IP_ADDRESS_POOL[0]
 MAC = msg[28:34]
 transactionID = msg[4:7]
 type = b'\x35\x01\x05' # type = ACK
