@@ -22,11 +22,19 @@ availability = [ '1',
 def available():
 	for i,n in enumerate(IP_ADDRESS_POOL):
 		if (availability[i] == '1'):
-			availability[i] = 0
 			return IP_ADDRESS_POOL[i]
 	
 	# IF NONE AVAILABLE
-	return '1'
+	return '-1'
+
+def stillavailable(requestedIP):
+	for i,n in enumerate(IP_ADDRESS_POOL):
+		if (IP_ADDRESS_POOL[i] == requestedIP) and (availability[i] == '1'):
+			availability[i] = 0
+			return True
+	
+	# IF NONE AVAILABLE
+	return False
 
 # Create packet
 def DHCP_PKT(ipAddress, MAC, transactionID, type):
@@ -82,7 +90,7 @@ while True:
 	# Find an available IP address
 	ipAddress = available()
 
-	while (ipAddress != '1'):
+	while (ipAddress != '-1'):
 		MAC = msg[28:34]
 		transactionID = msg[4:8]
 		type = b'\x35\x01\x02' # type = OFFER
@@ -100,8 +108,8 @@ while True:
 		# Recieve a UDP message (Request)
 		msg, addr = s.recvfrom(1024)
 
-		# Give the first IP address
-		if (ipAddress == msg[254:257]):
+		# Give the first IP address && check still available?
+		if (stillavailable(msg[254:257])):
 			MAC = msg[28:34]
 			transactionID = msg[4:7]
 			type = b'\x35\x01\x05' # type = ACK
@@ -109,6 +117,6 @@ while True:
 
 			# Broadcast ACK
 			s.sendto(pkt, DHCP_CLIENT)
-			ipAddress == '1' # exit loop else keep checking new ipAddresses
+			ipAddress == '-1' # exit loop else keep checking new ipAddresses
 		else:
 			ipAddress = available()
